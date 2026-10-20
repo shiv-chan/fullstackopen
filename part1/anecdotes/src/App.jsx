@@ -1,4 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const Anecdote = ({ anecdote, votes }) => {
+    return (
+        <div>
+            <p>{anecdote}</p>
+            <p>has {votes} votes</p>
+        </div>
+    );
+};
 
 const App = () => {
     const anecdotes = [
@@ -22,25 +31,46 @@ const App = () => {
 
     const votes = { ...Array(8).fill(0) };
     const [voteCounts, setVoteCounts] = useState(votes);
+    const [maxVotes, setMaxVotes] = useState([0, 0]); // [key, value]
+
+    useEffect(() => {
+        setMaxVotes((prevState) => {
+            if (prevState[1] < voteCounts[selected]) {
+                return [selected, voteCounts[selected]];
+            }
+            return prevState;
+        });
+    }, [voteCounts]);
 
     const incrementVote = () => {
-        const newVoteCounts = {
-            ...voteCounts,
-            [selected]: voteCounts[selected] + 1,
-        };
-        setVoteCounts(newVoteCounts);
+        setVoteCounts((prevState) => {
+            return {
+                ...prevState,
+                [selected]: prevState[selected] + 1,
+            };
+        });
     };
 
     return (
         <>
             <div>
-                <p>{anecdotes[selected]}</p>
-                <p>has {voteCounts[selected]} votes</p>
+                <h2>Anecdote of the day</h2>
+                <Anecdote
+                    anecdote={anecdotes[selected]}
+                    votes={voteCounts[selected]}
+                />
+                <button onClick={incrementVote}>vote</button>
+                <button onClick={() => setSelected(generateRandomIndex())}>
+                    next anecdote
+                </button>
             </div>
-            <button onClick={incrementVote}>vote</button>
-            <button onClick={() => setSelected(generateRandomIndex())}>
-                next anecdote
-            </button>
+            <div>
+                <h2>Anecdote with most votes</h2>
+                <Anecdote
+                    anecdote={anecdotes[maxVotes[0]]}
+                    votes={maxVotes[1]}
+                />
+            </div>
         </>
     );
 };
