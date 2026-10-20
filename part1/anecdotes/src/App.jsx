@@ -20,9 +20,24 @@ const App = () => {
         return randomIndex;
     };
 
+    const votes = { ...Array(8).fill(0) };
+    const [voteCounts, setVoteCounts] = useState(votes);
+
+    const incrementVote = () => {
+        const newVoteCounts = {
+            ...voteCounts,
+            [selected]: voteCounts[selected] + 1,
+        };
+        setVoteCounts(newVoteCounts);
+    };
+
     return (
         <>
-            <div>{anecdotes[selected]}</div>
+            <div>
+                <p>{anecdotes[selected]}</p>
+                <p>has {voteCounts[selected]} votes</p>
+            </div>
+            <button onClick={incrementVote}>vote</button>
             <button onClick={() => setSelected(generateRandomIndex())}>
                 next anecdote
             </button>
